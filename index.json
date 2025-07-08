@@ -1,0 +1,44 @@
+
+[
+  {
+    "name": "template",
+    "id": "template",
+    "version": "1.0.0",
+    "author": "Axw",
+    "url": "template/module_template.py",
+    "description": "AFEDIUM模块示例模板",
+    "type": "module",
+    "dependencies": [],
+    "pip_dependencies": [],
+    "linux_dependencies": []
+  },
+  {
+    "name": "fureyev1",
+    "id": "fureyev1",
+    "version": "1.0.0",
+    "author": "Axw",
+    "url": "fureyev1/fureyev1.py",
+    "description": "",
+    "type": "module",
+    "dependencies": [],
+    "pip_dependencies": [
+      "pillow"
+    ],
+    "linux_dependencies": [
+      "python3-tk",
+      "python3-pil.imagetk"
+    ]
+  },
+  {
+    "name": "fureye_driver",
+    "id": "fureye_driver",
+    "version": "1.0.0",
+    "author": "Axw",
+    "url": "fureyev1/fureye_driver.py",
+    "description": "",
+    "type": "module",
+    "dependencies": ["fureyev1"],
+    "pip_dependencies": [],
+    "linux_dependencies": []
+  }
+]
