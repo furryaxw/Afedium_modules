@@ -1,5 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
     const gridContainer = document.getElementById("module-grid");
+    const pageTitleElement = document.getElementById("page-title");
 
     fetch("index.json")
         .then(response => {
@@ -8,12 +9,26 @@ document.addEventListener("DOMContentLoaded", () => {
             }
             return response.json();
         })
-        .then(modules => {
+        .then(data => {
+            // --- 关键改动：适配新的JSON结构 ---
+            const modules = data.modules; // 获取 "modules" 数组
+            const baseUrl = data.base_url || ''; // 获取 base_url
+
+            // 使用JSON中的"site"字段更新页面标题
+            if (data.site) {
+                document.title = data.site;
+                pageTitleElement.textContent = data.site;
+            }
+
+            if (!modules || !Array.isArray(modules)) {
+                throw new Error("JSON数据中未找到有效的 'modules' 数组。");
+            }
+            // --- 结束 ---
+
             modules.forEach(module => {
                 const moduleDiv = document.createElement("div");
                 moduleDiv.className = "module";
 
-                // ... 标题和描述部分无变动 ...
                 const nameH2 = document.createElement("h2");
                 if (module.homepage) {
                     const link = document.createElement("a");
@@ -42,35 +57,25 @@ document.addEventListener("DOMContentLoaded", () => {
                     moduleDiv.appendChild(placeholder);
                 }
 
-                // --- 依赖项部分 (已更新) ---
                 const dependenciesDiv = document.createElement("div");
                 dependenciesDiv.className = "module-dependencies";
-
                 const depTypes = [
                     { title: "模块依赖", key: "dependencies" },
                     { title: "Pip 依赖", key: "pip_dependencies" },
                     { title: "Linux 依赖", key: "linux_dependencies" }
                 ];
-
                 const hasDependencies = depTypes.some(dep => module[dep.key] && module[dep.key].length > 0);
-
                 if (hasDependencies) {
                     const table = document.createElement("table");
-
                     depTypes.forEach(depType => {
                         const deps = module[depType.key];
                         if (deps && deps.length > 0) {
                             const row = table.insertRow();
-
                             const cellType = row.insertCell();
                             cellType.className = "dep-type";
                             cellType.textContent = depType.title + ":";
-
                             const cellList = row.insertCell();
-                            cellList.className = "dep-list-cell"; // 使用新的class
-
-                            // --- 关键改动在这里 ---
-                            // 遍历依赖项，为每个依赖创建一个span标签
+                            cellList.className = "dep-list-cell";
                             deps.forEach(dep => {
                                 const tag = document.createElement("span");
                                 tag.className = "dep-tag";
@@ -79,13 +84,10 @@ document.addEventListener("DOMContentLoaded", () => {
                             });
                         }
                     });
-
                     dependenciesDiv.appendChild(table);
                 }
-
                 moduleDiv.appendChild(dependenciesDiv);
 
-                // --- 页脚区域 (无变动) ---
                 const cardFooter = document.createElement("div");
                 cardFooter.className = "card-footer";
                 const typeSpan = document.createElement("span");
@@ -102,7 +104,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 const downloadBtn = document.createElement("a");
                 downloadBtn.className = "download-btn";
-                downloadBtn.href = module.url;
+                // --- 关键改动：使用 base_url 拼接下载链接 ---
+                // 使用 URL 构造函数来安全地拼接，避免斜杠问题
+                downloadBtn.href = new URL(module.url, baseUrl).href;
                 downloadBtn.textContent = "下载";
                 footerRight.appendChild(downloadBtn);
 
@@ -114,6 +118,6 @@ document.addEventListener("DOMContentLoaded", () => {
         })
         .catch(error => {
             console.error("获取或解析模块时出错:", error);
-            gridContainer.innerHTML = "<p style='color: red;'>加载模块出错，请检查控制台获取详细信息。</p>";
+            gridContainer.innerHTML = `<p style='color: red;'>${error.message}</p>`;
         });
 });

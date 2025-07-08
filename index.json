@@ -1,47 +1,56 @@
 
-[
-  {
-    "name": "模块模板",
-    "id": "template",
-    "version": "1.0.0",
-    "author": "Axw",
-    "url": "template/module_template.py",
-    "homepage": "",
-    "description": "AFEDIUM模块示例模板",
-    "type": "module",
-    "dependencies": [],
-    "pip_dependencies": [],
-    "linux_dependencies": []
-  },
-  {
-    "name": "电子眼模块",
-    "id": "fureye",
-    "version": "1.0.0",
-    "author": "Axw",
-    "url": "fureye/fureyev1.py",
-    "homepage": "",
-    "description": "",
-    "type": "module",
-    "dependencies": [],
-    "pip_dependencies": [
-      "pillow"
-    ],
-    "linux_dependencies": [
-      "python3-tk",
-      "python3-pil.imagetk"
-    ]
-  },
-  {
-    "name": "电子眼驱动",
-    "id": "fureye_driver",
-    "version": "1.0.0",
-    "author": "Axw",
-    "url": "fureye/fureye_driver.py",
-    "homepage": "",
-    "description": "",
-    "type": "module",
-    "dependencies": ["fureye"],
-    "pip_dependencies": [],
-    "linux_dependencies": []
-  }
-]
+{
+  "site": "Afedium官方模块仓库",
+  "base_url": "http://modules.afedium.furryaxw.top/",
+  "last_update_date": "",
+  "version": 1,
+
+  "modules": [
+    {
+      "name": "模块模板",
+      "id": "template",
+      "version": "1.0.0",
+      "author": "Axw",
+      "url": "template/module_template.py",
+      "homepage": "",
+      "description": "AFEDIUM模块示例模板",
+      "type": "module",
+      "dependencies": [],
+      "pip_dependencies": [],
+      "linux_dependencies": []
+    },
+    {
+      "name": "电子眼模块",
+      "id": "fureye",
+      "version": "1.0.0",
+      "author": "Axw",
+      "url": "fureye/fureyev1.py",
+      "homepage": "",
+      "description": "",
+      "type": "module",
+      "dependencies": [],
+      "pip_dependencies": [
+        "pillow"
+      ],
+      "linux_dependencies": [
+        "python3-tk",
+        "python3-pil.imagetk"
+      ]
+    },
+    {
+      "name": "电子眼驱动",
+      "id": "fureye_driver",
+      "version": "1.0.0",
+      "author": "Axw",
+      "url": "fureye/fureye_driver.py",
+      "homepage": "",
+      "description": "",
+      "type": "module",
+      "dependencies": [
+        "fureye"
+      ],
+      "pip_dependencies": [],
+      "linux_dependencies": []
+    }
+  ]
+}
