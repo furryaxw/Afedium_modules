@@ -26,7 +26,7 @@ def __init__():
     while True:
         time.sleep(0.1)
         try:
-            if static["running"]["fureyev1"]:
+            if static["running"]["fureye"]:
                 break
         except KeyError:
             pass
