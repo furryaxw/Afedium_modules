@@ -22,12 +22,10 @@ config = Config("display", default)
 
 
 Info = {
-    "name": "fureyev1",
-    "id": "fureyev1",
+    "name": "fureye",
+    "id": "fureye",
     "version": "1.0.0",
     "author": "Axw",
-    "url": "fureyev1/fureyev1.py",
-    "description": "",
     "type": "module",
     "dependencies": [],
     "pip_dependencies": [

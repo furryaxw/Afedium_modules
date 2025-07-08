@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
-    const container = document.getElementById("module-container");
+    const gridContainer = document.getElementById("module-grid");
 
     fetch("index.json")
         .then(response => {
@@ -10,76 +10,110 @@ document.addEventListener("DOMContentLoaded", () => {
         })
         .then(modules => {
             modules.forEach(module => {
-                // 为每个模块创建一个容器 div
                 const moduleDiv = document.createElement("div");
                 moduleDiv.className = "module";
 
-                // 创建一个 <a> 标签作为链接
-                const link = document.createElement("a");
-                link.href = module.url; // 设置链接地址为模块的 URL
-                link.style.textDecoration = 'none'; // 可选：去掉链接的下划线
+                // ... 标题和描述部分无变动 ...
+                const nameH2 = document.createElement("h2");
+                if (module.homepage) {
+                    const link = document.createElement("a");
+                    link.href = module.homepage;
+                    link.textContent = module.name;
+                    link.target = "_blank";
+                    link.rel = "noopener noreferrer";
+                    nameH2.appendChild(link);
+                } else {
+                    nameH2.textContent = module.name;
+                }
+                const idSpan = document.createElement("span");
+                idSpan.className = "module-id";
+                idSpan.textContent = module.id;
+                nameH2.appendChild(idSpan);
+                moduleDiv.appendChild(nameH2);
 
-                // 模块名称 (H2)
-                const name = document.createElement("h2");
-                name.textContent = module.name;
-
-                // 将 H2 标题放入链接中
-                link.appendChild(name);
-
-                // 将完整的链接（包含标题）添加到模块 DIV 中
-                moduleDiv.appendChild(link);
-                // --- 修改结束 ---
-
-                // 模块描述
                 if (module.description) {
                     const description = document.createElement("p");
+                    description.className = "description";
                     description.textContent = module.description;
                     moduleDiv.appendChild(description);
+                } else {
+                    const placeholder = document.createElement("p");
+                    placeholder.className = "description";
+                    moduleDiv.appendChild(placeholder);
                 }
 
-                // 模块元信息 (作者, 版本)
-                const meta = document.createElement("div");
-                meta.className = "module-meta";
-                meta.innerHTML = `
-                    <span>作者: ${module.author}</span> |
-                    <span>版本: ${module.version}</span>
-                `;
-                moduleDiv.appendChild(meta);
-
-                // 依赖项的容器
+                // --- 依赖项部分 (已更新) ---
                 const dependenciesDiv = document.createElement("div");
                 dependenciesDiv.className = "module-dependencies";
 
-                // 渲染依赖列表的辅助函数
-                const renderDependencies = (title, deps) => {
-                    if (deps && deps.length > 0) {
-                        const strong = document.createElement("strong");
-                        strong.textContent = title;
-                        dependenciesDiv.appendChild(strong);
+                const depTypes = [
+                    { title: "模块依赖", key: "dependencies" },
+                    { title: "Pip 依赖", key: "pip_dependencies" },
+                    { title: "Linux 依赖", key: "linux_dependencies" }
+                ];
 
-                        const list = document.createElement("ul");
-                        deps.forEach(dep => {
-                            const item = document.createElement("li");
-                            item.textContent = dep;
-                            list.appendChild(item);
-                        });
-                        dependenciesDiv.appendChild(list);
-                    }
-                };
+                const hasDependencies = depTypes.some(dep => module[dep.key] && module[dep.key].length > 0);
 
-                // 渲染各种依赖
-                renderDependencies("模块依赖:", module.dependencies);
-                renderDependencies("Pip 依赖:", module.pip_dependencies);
-                renderDependencies("Linux 依赖:", module.linux_dependencies);
+                if (hasDependencies) {
+                    const table = document.createElement("table");
+
+                    depTypes.forEach(depType => {
+                        const deps = module[depType.key];
+                        if (deps && deps.length > 0) {
+                            const row = table.insertRow();
+
+                            const cellType = row.insertCell();
+                            cellType.className = "dep-type";
+                            cellType.textContent = depType.title + ":";
+
+                            const cellList = row.insertCell();
+                            cellList.className = "dep-list-cell"; // 使用新的class
+
+                            // --- 关键改动在这里 ---
+                            // 遍历依赖项，为每个依赖创建一个span标签
+                            deps.forEach(dep => {
+                                const tag = document.createElement("span");
+                                tag.className = "dep-tag";
+                                tag.textContent = dep;
+                                cellList.appendChild(tag);
+                            });
+                        }
+                    });
+
+                    dependenciesDiv.appendChild(table);
+                }
 
                 moduleDiv.appendChild(dependenciesDiv);
 
-                // 将完整的模块 div 添加到主容器中
-                container.appendChild(moduleDiv);
+                // --- 页脚区域 (无变动) ---
+                const cardFooter = document.createElement("div");
+                cardFooter.className = "card-footer";
+                const typeSpan = document.createElement("span");
+                typeSpan.className = "module-type";
+                typeSpan.textContent = module.type || "未知类型";
+                cardFooter.appendChild(typeSpan);
+
+                const footerRight = document.createElement("div");
+                footerRight.className = "footer-right";
+                const metaSpan = document.createElement("span");
+                metaSpan.className = "module-meta";
+                metaSpan.innerHTML = `<span>作者: ${module.author}</span> | <span>版本: ${module.version}</span>`;
+                footerRight.appendChild(metaSpan);
+
+                const downloadBtn = document.createElement("a");
+                downloadBtn.className = "download-btn";
+                downloadBtn.href = module.url;
+                downloadBtn.textContent = "下载";
+                footerRight.appendChild(downloadBtn);
+
+                cardFooter.appendChild(footerRight);
+                moduleDiv.appendChild(cardFooter);
+
+                gridContainer.appendChild(moduleDiv);
             });
         })
         .catch(error => {
             console.error("获取或解析模块时出错:", error);
-            container.innerHTML += "<p style='color: red;'>加载模块出错，请检查控制台获取详细信息。</p>";
+            gridContainer.innerHTML = "<p style='color: red;'>加载模块出错，请检查控制台获取详细信息。</p>";
         });
 });

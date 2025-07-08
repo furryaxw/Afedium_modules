@@ -12,10 +12,8 @@ Info = {
     "id": "fureye_driver",
     "version": "1.0.0",
     "author": "Axw",
-    "url": "fureyev1/fureye_driver.py",
-    "description": "",
     "type": "module",
-    "dependencies": ["fureyev1"],
+    "dependencies": ["fureye"],
     "pip_dependencies": [],
     "linux_dependencies": []
 }

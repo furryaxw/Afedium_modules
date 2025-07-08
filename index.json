@@ -6,6 +6,7 @@
     "version": "1.0.0",
     "author": "Axw",
     "url": "template/module_template.py",
+    "homepage": "",
     "description": "AFEDIUM模块示例模板",
     "type": "module",
     "dependencies": [],
@@ -13,11 +14,12 @@
     "linux_dependencies": []
   },
   {
-    "name": "fureyev1",
-    "id": "fureyev1",
+    "name": "电子眼模块",
+    "id": "fureye",
     "version": "1.0.0",
     "author": "Axw",
-    "url": "fureyev1/fureyev1.py",
+    "url": "fureye/fureyev1.py",
+    "homepage": "",
     "description": "",
     "type": "module",
     "dependencies": [],
@@ -30,14 +32,15 @@
     ]
   },
   {
-    "name": "fureye_driver",
+    "name": "电子眼驱动",
     "id": "fureye_driver",
     "version": "1.0.0",
     "author": "Axw",
-    "url": "fureyev1/fureye_driver.py",
+    "url": "fureye/fureye_driver.py",
+    "homepage": "",
     "description": "",
     "type": "module",
-    "dependencies": ["fureyev1"],
+    "dependencies": ["fureye"],
     "pip_dependencies": [],
     "linux_dependencies": []
   }
