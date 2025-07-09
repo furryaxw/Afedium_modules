@@ -10,8 +10,11 @@ default = {
 Info = {
     "name": "电子眼驱动",
     "id": "fureye_driver",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "author": "Axw",
+    "url": "http://modules.afedium.furryaxw.top/modules/fureye_driver.py",
+    "homepage": "",
+    "description": "",
     "type": "module",
     "dependencies": ["fureye"],
     "pip_dependencies": [],
@@ -32,7 +35,7 @@ def __init__():
             pass
     mdata = []
     for i in range(config_t.conf["num_display"]):
-        mdata.append(dynamic["eyes"][i]["eyeball"])
+        mdata.append(dynamic["fureye"][i]["eyeball"])
         mdata[i]["enabled"] = True
     static["running"][Info["id"]] = True
     while static["running"][Info["id"]]:

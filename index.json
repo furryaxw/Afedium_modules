@@ -1,30 +1,16 @@
-
 {
   "site": "Afedium官方模块仓库",
   "base_url": "http://modules.afedium.furryaxw.top/",
   "last_update_date": "",
+  "module_count": 3,
   "version": 1,
-
   "modules": [
-    {
-      "name": "模块模板",
-      "id": "template",
-      "version": "1.0.0",
-      "author": "Axw",
-      "url": "template/module_template.py",
-      "homepage": "",
-      "description": "AFEDIUM模块示例模板",
-      "type": "module",
-      "dependencies": [],
-      "pip_dependencies": [],
-      "linux_dependencies": []
-    },
     {
       "name": "电子眼模块",
       "id": "fureye",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "author": "Axw",
-      "url": "fureye/fureyev1.py",
+      "url": "http://modules.afedium.furryaxw.top/modules/fureyev1.py",
       "homepage": "",
       "description": "",
       "type": "module",
@@ -40,15 +26,28 @@
     {
       "name": "电子眼驱动",
       "id": "fureye_driver",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "author": "Axw",
-      "url": "fureye/fureye_driver.py",
+      "url": "http://modules.afedium.furryaxw.top/modules/fureye_driver.py",
       "homepage": "",
       "description": "",
       "type": "module",
       "dependencies": [
         "fureye"
       ],
+      "pip_dependencies": [],
+      "linux_dependencies": []
+    },
+    {
+      "name": "模板",
+      "id": "template",
+      "version": "1.0.0",
+      "author": "Axw",
+      "url": "http://modules.afedium.furryaxw.top/template/module_template.py",
+      "homepage": "",
+      "description": "AFEDIUM模块示例模板",
+      "type": "module",
+      "dependencies": [],
       "pip_dependencies": [],
       "linux_dependencies": []
     }

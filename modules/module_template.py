@@ -12,6 +12,9 @@ Info = {
     "id": "template",  # 模块ID
     "version": "1.0.0",  # 模块版本
     "author": "Axw",  # 模块作者
+    "url": "http://modules.afedium.furryaxw.top/template/module_template.py",
+    "homepage": "",
+    "description": "AFEDIUM模块示例模板",
     "type": "module",  # 模块类型
     "dependencies": [],  # 对其他模块依赖
     "pip_dependencies": [],  # PIP库依赖

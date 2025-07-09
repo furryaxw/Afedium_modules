@@ -24,8 +24,11 @@ config = Config("display", default)
 Info = {
     "name": "电子眼模块",
     "id": "fureye",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "author": "Axw",
+    "url": "http://modules.afedium.furryaxw.top/modules/fureyev1.py",
+    "homepage": "",
+    "description": "",
     "type": "module",
     "dependencies": [],
     "pip_dependencies": [
@@ -41,12 +44,12 @@ Info = {
 def __init__():
     global files, layer, screen_width, screen_height, canvas
 
-    dynamic['eyes'] = []
+    dynamic[Info["id"]] = []
     root = Tk()
     root.state('iconic')
     root.geometry('0x0+0+0')
     for d in range(config.conf["num_display"]):
-        dynamic['eyes'].insert(d, {})
+        dynamic[Info["id"]].insert(d, {})
         d_window.insert(d, Toplevel())
         screen_width = d_window[d].winfo_screenwidth()
         screen_height = d_window[d].winfo_screenheight()
@@ -74,25 +77,25 @@ def __init__():
     while static["running"][Info["id"]]:
         for d in range(config.conf["num_display"]):
             for i in layer[d].keys():
-                if dynamic['eyes'][d][i]["enabled"]:
-                    x = int(dynamic['eyes'][d][i]["x"] * screen_width / 2 + screen_width / 2 - files[i][
-                        dynamic['eyes'][d][i]["selected"]].width() / 2)
-                    y = int(dynamic['eyes'][d][i]["y"] * screen_height / 2 + screen_height / 2 - files[i][
-                        dynamic['eyes'][d][i]["selected"]].height() / 2)
-                    dynamic['eyes'][d][i]["nx"] = (int(
-                        canvas[d].coords(layer[d][i][dynamic['eyes'][d][i]["selected"]])[0]) - screen_width / 2 +
+                if dynamic[Info["id"]][d][i]["enabled"]:
+                    x = int(dynamic[Info["id"]][d][i]["x"] * screen_width / 2 + screen_width / 2 - files[i][
+                        dynamic[Info["id"]][d][i]["selected"]].width() / 2)
+                    y = int(dynamic[Info["id"]][d][i]["y"] * screen_height / 2 + screen_height / 2 - files[i][
+                        dynamic[Info["id"]][d][i]["selected"]].height() / 2)
+                    dynamic[Info["id"]][d][i]["nx"] = (int(
+                        canvas[d].coords(layer[d][i][dynamic[Info["id"]][d][i]["selected"]])[0]) - screen_width / 2 +
                                                    files[i][
-                                                       dynamic['eyes'][d][i][
+                                                       dynamic[Info["id"]][d][i][
                                                            "selected"]].width() / 2) / screen_width * 2
-                    dynamic['eyes'][d][i]["ny"] = (int(
-                        canvas[d].coords(layer[d][i][dynamic['eyes'][d][i]["selected"]])[1]) - screen_height / 2 +
+                    dynamic[Info["id"]][d][i]["ny"] = (int(
+                        canvas[d].coords(layer[d][i][dynamic[Info["id"]][d][i]["selected"]])[1]) - screen_height / 2 +
                                                    files[i][
-                                                       dynamic['eyes'][d][i][
+                                                       dynamic[Info["id"]][d][i][
                                                            "selected"]].height() / 2) / screen_height * 2
                     if len(layer[d][i]) > 1:
                         for j in layer[d][i]:
                             canvas[d].moveto(j, screen_width, screen_height)
-                    canvas[d].moveto(layer[d][i][dynamic['eyes'][d][i]["selected"]], x, y)
+                    canvas[d].moveto(layer[d][i][dynamic[Info["id"]][d][i]["selected"]], x, y)
                 else:
                     for j in layer[d][i]:
                         canvas[d].moveto(j, screen_width, screen_height)
@@ -120,21 +123,21 @@ def load(name, size, on_display=-1, as_f=""):
         name = as_f
     if on_display == -1:
         for d in range(config.conf["num_display"]):
-            dynamic['eyes'][d][name] = {}
-            dynamic['eyes'][d][name]["x"] = 0
-            dynamic['eyes'][d][name]["y"] = 0
-            dynamic['eyes'][d][name]["nx"] = 0
-            dynamic['eyes'][d][name]["ny"] = 0
-            dynamic['eyes'][d][name]["selected"] = 0
-            dynamic['eyes'][d][name]["enabled"] = False
+            dynamic[Info["id"]][d][name] = {}
+            dynamic[Info["id"]][d][name]["x"] = 0
+            dynamic[Info["id"]][d][name]["y"] = 0
+            dynamic[Info["id"]][d][name]["nx"] = 0
+            dynamic[Info["id"]][d][name]["ny"] = 0
+            dynamic[Info["id"]][d][name]["selected"] = 0
+            dynamic[Info["id"]][d][name]["enabled"] = False
     else:
-        dynamic['eyes'][on_display][name] = {}
-        dynamic['eyes'][on_display][name]["x"] = 0
-        dynamic['eyes'][on_display][name]["y"] = 0
-        dynamic['eyes'][on_display][name]["nx"] = 0
-        dynamic['eyes'][on_display][name]["ny"] = 0
-        dynamic['eyes'][on_display][name]["selected"] = 0
-        dynamic['eyes'][on_display][name]["enabled"] = False
+        dynamic[Info["id"]][on_display][name] = {}
+        dynamic[Info["id"]][on_display][name]["x"] = 0
+        dynamic[Info["id"]][on_display][name]["y"] = 0
+        dynamic[Info["id"]][on_display][name]["nx"] = 0
+        dynamic[Info["id"]][on_display][name]["ny"] = 0
+        dynamic[Info["id"]][on_display][name]["selected"] = 0
+        dynamic[Info["id"]][on_display][name]["enabled"] = False
     scale = int(float(size) * screen_height)
     try:
         if name in list(layer[on_display].keys()):
