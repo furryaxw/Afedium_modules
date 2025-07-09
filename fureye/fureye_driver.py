@@ -8,7 +8,7 @@ default = {
 
 
 Info = {
-    "name": "fureye_driver",
+    "name": "电子眼驱动",
     "id": "fureye_driver",
     "version": "1.0.0",
     "author": "Axw",

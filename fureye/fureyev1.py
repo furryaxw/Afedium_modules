@@ -22,7 +22,7 @@ config = Config("display", default)
 
 
 Info = {
-    "name": "fureye",
+    "name": "电子眼模块",
     "id": "fureye",
     "version": "1.0.0",
     "author": "Axw",
