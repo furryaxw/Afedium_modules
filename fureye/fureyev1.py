@@ -44,6 +44,7 @@ def __init__():
     dynamic['eyes'] = []
     root = Tk()
     root.state('iconic')
+    root.geometry('0x0+0+0')
     for d in range(config.conf["num_display"]):
         dynamic['eyes'].insert(d, {})
         d_window.insert(d, Toplevel())
