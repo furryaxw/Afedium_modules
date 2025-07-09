@@ -10,7 +10,6 @@ document.addEventListener("DOMContentLoaded", () => {
             return response.json();
         })
         .then(data => {
-            // --- 关键改动：适配新的JSON结构 ---
             const modules = data.modules; // 获取 "modules" 数组
             const baseUrl = data.base_url || ''; // 获取 base_url
 
@@ -23,7 +22,6 @@ document.addEventListener("DOMContentLoaded", () => {
             if (!modules || !Array.isArray(modules)) {
                 throw new Error("JSON数据中未找到有效的 'modules' 数组。");
             }
-            // --- 结束 ---
 
             modules.forEach(module => {
                 const moduleDiv = document.createElement("div");
@@ -104,8 +102,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 const downloadBtn = document.createElement("a");
                 downloadBtn.className = "download-btn";
-                // --- 关键改动：使用 base_url 拼接下载链接 ---
-                // 使用 URL 构造函数来安全地拼接，避免斜杠问题
                 downloadBtn.href = new URL(module.url, baseUrl).href;
                 downloadBtn.textContent = "下载";
                 footerRight.appendChild(downloadBtn);
