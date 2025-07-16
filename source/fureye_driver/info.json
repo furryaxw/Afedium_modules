@@ -1,0 +1,13 @@
+{
+    "name": "电子眼驱动",
+    "id": "fureye_driver",
+    "version": "1.0.1",
+    "author": "Axw",
+    "url": "http://modules.afedium.furryaxw.top/modules/fureye_driver.py",
+    "homepage": "",
+    "description": "",
+    "type": "module",
+    "dependencies": ["fureye"],
+    "pip_dependencies": [],
+    "linux_dependencies": []
+}

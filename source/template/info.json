@@ -1,0 +1,13 @@
+{
+  "name": "模板",
+  "id": "template",
+  "version": "1.0.0",
+  "author": "Axw",
+  "url": "http://modules.afedium.furryaxw.top/modules/template.pyz",
+  "homepage": "",
+  "description": "AFEDIUM模块示例模板",
+  "type": "pyz",
+  "dependencies": [],
+  "pip_dependencies": [],
+  "linux_dependencies": []
+}
