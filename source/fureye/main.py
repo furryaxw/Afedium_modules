@@ -30,16 +30,9 @@ class AFEDIUMPlugin:
 
     def setup(self):
         dynamic[self.info["id"]] = []
-        # 1. 【必须修改】等待并获取由 display_manager 共享的 tk_root
-        print(f"插件 '{self.id}': 正在等待Tkinter环境...")
-        # 循环等待，直到 display_manager 准备好 tk_root
-        while 'tk_root' not in static or not static.get('tk_root'):
-            sleep(0.1)
-
-        self.tk_root = static.get('tk_root')
-        print(f"插件 '{self.id}': 已成功获取Tkinter主实例。")
 
     def main_loop(self):
+        self.tk_root = static.get('tk_root')
         # 检查 tk_root 是否已成功获取
         if not self.tk_root:
             print(f"错误：插件 '{self.id}' 未能获取到Tkinter主实例，无法创建窗口。")
