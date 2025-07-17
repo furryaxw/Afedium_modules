@@ -2,7 +2,7 @@
   "site": "Afedium官方模块仓库",
   "base_url": "http://modules.afedium.furryaxw.top/",
   "last_update_date": "",
-  "module_count": 3,
+  "module_count": 4,
   "version": 2,
   "modules": [
     {
@@ -32,10 +32,24 @@
       "homepage": "",
       "description": "",
       "type": "module",
-      "dependencies": [
-        "fureye"
-      ],
+      "dependencies": [],
       "pip_dependencies": [],
+      "linux_dependencies": []
+    },
+    {
+      "name": "电子眼模块(Pygame)",
+      "id": "fureye",
+      "version": "1.0.0",
+      "author": "Axw",
+      "url": "http://modules.afedium.furryaxw.top/modules/fureye_pygame.pyz",
+      "homepage": "",
+      "description": "",
+      "type": "module",
+      "dependencies": [],
+      "pip_dependencies": [
+        "pillow",
+        "pygame"
+      ],
       "linux_dependencies": []
     },
     {

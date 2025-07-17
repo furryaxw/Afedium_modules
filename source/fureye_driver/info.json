@@ -7,7 +7,7 @@
     "homepage": "",
     "description": "",
     "type": "module",
-    "dependencies": ["fureye"],
+    "dependencies": [],
     "pip_dependencies": [],
     "linux_dependencies": []
 }
