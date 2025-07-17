@@ -2,27 +2,9 @@
   "site": "Afedium官方模块仓库",
   "base_url": "http://modules.afedium.furryaxw.top/",
   "last_update_date": "",
-  "module_count": 4,
+  "module_count": 3,
   "version": 2,
   "modules": [
-    {
-      "name": "电子眼模块",
-      "id": "fureye",
-      "version": "1.0.1",
-      "author": "Axw",
-      "url": "http://modules.afedium.furryaxw.top/modules/fureye.pyz",
-      "homepage": "",
-      "description": "",
-      "type": "pyz",
-      "dependencies": [],
-      "pip_dependencies": [
-        "pillow"
-      ],
-      "linux_dependencies": [
-        "python3-tk",
-        "python3-pil.imagetk"
-      ]
-    },
     {
       "name": "电子眼驱动",
       "id": "fureye_driver",
