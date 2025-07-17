@@ -6,7 +6,7 @@
     "url": "http://modules.afedium.furryaxw.top/modules/fureye_pygame.pyz",
     "homepage": "",
     "description": "",
-    "type": "module",
+    "type": "pyz",
     "dependencies": [],
     "pip_dependencies": [
         "pillow",

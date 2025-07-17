@@ -13,7 +13,7 @@
       "url": "http://modules.afedium.furryaxw.top/modules/fureye.pyz",
       "homepage": "",
       "description": "",
-      "type": "module",
+      "type": "pyz",
       "dependencies": [],
       "pip_dependencies": [
         "pillow"
@@ -31,7 +31,7 @@
       "url": "http://modules.afedium.furryaxw.top/modules/fureye_driver.pyz",
       "homepage": "",
       "description": "",
-      "type": "module",
+      "type": "pyz",
       "dependencies": [],
       "pip_dependencies": [],
       "linux_dependencies": []
@@ -44,7 +44,7 @@
       "url": "http://modules.afedium.furryaxw.top/modules/fureye_pygame.pyz",
       "homepage": "",
       "description": "",
-      "type": "module",
+      "type": "pyz",
       "dependencies": [],
       "pip_dependencies": [
         "pillow",
