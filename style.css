@@ -1,0 +1,126 @@
+/* pages/Afedium_modules/style.css */
+
+#module-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 24px;
+}
+
+/* 模块卡片样式 - 已适配全局主题 */
+.module {
+    background: var(--card-color);
+    border: 1px solid var(--border-color);
+    border-radius: var(--card-border-radius);
+    padding: 24px;
+    box-shadow: 0 4px 6px var(--shadow-color);
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    display: flex;
+    flex-direction: column;
+}
+
+.module:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 15px var(--hover-shadow-color);
+    border-color: var(--accent-primary);
+}
+
+/* 1. 为标题和ID添加Flex布局和间距 */
+.module h2 {
+    display: flex;
+    align-items: flex-end;
+    gap: 10px; /* 控制 "模块名" 和 "id" 之间的距离 */
+}
+
+.module h2 a:hover {
+    color: var(--accent-primary);
+}
+
+.module-id {
+    font-size: 0.8em;
+    font-weight: 400;
+    color: #888;
+}
+
+.module .description {
+    font-size: 0.95em;
+    color: var(--text-secondary);
+    flex-grow: 1;
+    margin-bottom: 20px;
+}
+
+/* 依赖项表格样式 */
+.module-dependencies tr:not(:last-child) td {
+    border-bottom: 1px solid var(--border-color);
+}
+
+.dep-type {
+    width: 90px;
+    font-weight: 600;
+    font-size: 0.9em;
+    padding-right: 12px;
+    white-space: nowrap;
+}
+
+/* 2. 为依赖标签列表添加Flex布局和间距 */
+.dep-list-cell {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px; /* 控制 "pillow" 和 "pygame" 等标签之间的距离 */
+}
+
+.dep-tag {
+    background-color: var(--border-color);
+    color: var(--text-secondary);
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.85em;
+}
+
+/* 卡片页脚 */
+.card-footer {
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: auto;
+    padding-top: 16px;
+}
+
+.module-type {
+    font-size: 0.8em;
+    font-weight: 600;
+    color: var(--text-secondary);
+    background-color: var(--border-color);
+    padding: 2px 8px;
+    border-radius: 4px;
+}
+
+/* 3. 为页脚右侧元素添加Flex布局和间距 */
+.footer-right {
+    display: flex;
+    align-items: center;
+    gap: 12px; /* 控制 "作者/版本" 和 "下载" 按钮之间的距离 */
+}
+
+.module-meta {
+    font-size: 0.85em;
+    color: var(--text-secondary);
+}
+
+.download-btn {
+    display: inline-block;
+    background-color: var(--accent-primary);
+    color: var(--accent-on-primary);
+    padding: 4px 12px;
+    border-radius: 5px;
+    font-size: 0.85em;
+    font-weight: 500;
+    text-decoration: none;
+    transition: background-color 0.2s;
+    white-space: nowrap;
+}
+
+.download-btn:hover {
+    background-color: var(--accent-primary-hover);
+    text-decoration: none;
+}
