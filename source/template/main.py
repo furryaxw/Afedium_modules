@@ -1,40 +1,98 @@
-import time
-
-from lib.config import Config
-from lib.lib import static
-# 导入我们刚刚创建的框架级资源加载器
+# main.py
+from lib.Event import Event
+from lib.common import static, comm_lib
+from lib.logger import log
+from lib.plugin import AfediumPluginBase
 from lib.support_lib import get_plugin_resource
 
 
-class AFEDIUMPlugin:
-    # 定义默认配置，其中包括外部资源目录的名称
+class AFEDIUMPlugin(AfediumPluginBase):
+    # 1. 【接口演示：默认配置】
+    # 框架会自动合并这些配置到 config/<你的插件ID>.json，并提供 self.config 访问
     default_config = {
-        "loop_interval": 5
+        "loop_interval": 5,
+        "welcome_message": "这是V2架构演示插件"
     }
 
-    def __init__(self, info, config):
-        self.info = info
-        self.config = config
-        self.id = info["id"]
-        self.img = None
-
     def setup(self):
-        print(f"模块 '{self.info['name']}' 正在执行 setup...")
-        # 在 setup 阶段加载资源
-        # 插件只需要告诉框架“我是谁(self.id)”和“我需要什么('src/img.png')”
-        self.img = get_plugin_resource(self.id, 'src/img.png')
-        if self.img:
-            print(f"[{self.info['name']}] 成功加载了资源，大小: {len(self.img)} 字节")
+        # 2. 【接口演示：标准日志】
+        log.info(f"[{self.id}] 正在执行 setup...")
+
+        self.interval = self.config.conf.get("loop_interval", 5)
+
+        # 3. 【接口演示：跨环境资源加载】
+        # 自动在外部 plugin_data/ 目录和内部 .pyz 压缩包中寻找资源，mode='rb' 为读取二进制
+        self.img_data = get_plugin_resource(self.id, 'src/img.png', mode='rb')
+        if self.img_data:
+            log.info(f"[{self.id}] 成功加载资源，大小: {len(self.img_data)} 字节")
         else:
-            print(f"[{self.info['name']}] 警告: 未能加载资源")
+            log.warning(f"[{self.id}] 警告: 未能加载资源 src/img.png")
+
+        # 4. 【接口演示：指令注册】
+        comm_lib.register("demo", self.command_handler)
+
+        # 5. 【接口演示：事件总线】
+        static["event_handler"].register_event("ExternalIO_IN", self.on_message_received)
+
+        return True  # 必须返回 True，框架才会启动 main_loop
 
     def main_loop(self):
+        log.info(f"[{self.id}] 进入后台主循环。")
         static["running"][self.id] = True
-        try:
-            while static["running"].get(self.id, False):
-                time.sleep(self.config.conf.get("loop_interval"))
-        finally:
-            self.teardown()
+
+        # 6. 【接口演示：协作式优雅退出】
+        # 严禁使用 time.sleep()！使用 self.stop_event.wait(timeout) 可以随时被系统的关闭指令唤醒
+        while not self.stop_event.is_set():
+            # 这里写你的后台周期性任务
+            pass
+
+            self.stop_event.wait(timeout=self.interval)
 
     def teardown(self):
-        print(f"模块 '{self.info.get('name')}' 已退出。")
+        # 7. 【接口演示：资源清理】
+        # 在退出时务必注销指令和事件，防止内存泄漏和路由冲突
+        comm_lib.unregister("demo")
+        static["event_handler"].unregister_event("ExternalIO_IN", self.on_message_received)
+        log.info(f"[{self.id}] 模块已安全释放并退出。")
+
+    # ================= 业务方法演示 =================
+
+    def command_handler(self, ctx, args: list):
+        """
+        处理外界发来的 'demo' 指令
+        :param ctx: CommandContext 上下文对象，用于多端输出隔离
+        :param args: 用户参数
+        """
+        if not args:
+            # 使用 ctx.reply() 代替原来的 return 纯文本，支持分段流式输出
+            msg = self.config.conf.get("welcome_message")
+            ctx.reply(f"当前配置消息: {msg}")
+            return "输入 'demo help' 查看更多功能"
+
+        action = args[0]
+        if action == "help":
+            ctx.reply("这是一个指令上下文演示。")
+            # 可以获取触发指令的客户端连接信息（如果是通过 WebSocket 触发的话）
+            if ctx.client_id:
+                ctx.reply(f"您的客户端对象是: {ctx.client_id.remote_address}")
+            return "帮助信息打印完毕"
+
+        elif action == "edit":
+            # 8. 【接口演示：安全覆写配置】
+            self.config.conf["welcome_message"] = "配置已被动态修改！"
+            self.config.update()  # 自带读写锁，线程安全地将改动落盘
+            return "配置已更新"
+
+        else:
+            return f"未知参数: {action}"
+
+    def on_message_received(self, event: Event):
+        """
+        当触发 ExternalIO_IN 事件时被调用
+        """
+        message = event.data.get("message")
+        client = event.data.get("client_id")
+
+        # 避免日志刷屏，仅在消息是文本且包含特定词时捕获
+        if isinstance(message, str) and "测试" in message:
+            log.info(f"[{self.id}] 侦听到了来自 {client.remote_address} 的测试消息！")

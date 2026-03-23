@@ -6,38 +6,9 @@
   "version": 2,
   "modules": [
     {
-      "name": "电子眼驱动",
-      "id": "fureye_driver",
-      "version": "1.0.1",
-      "author": "Axw",
-      "url": "http://modules.afedium.furryaxw.top/modules/fureye_driver.pyz",
-      "homepage": "",
-      "description": "",
-      "type": "pyz",
-      "dependencies": [],
-      "pip_dependencies": [],
-      "linux_dependencies": []
-    },
-    {
-      "name": "电子眼模块(Pygame)",
-      "id": "fureye",
-      "version": "1.0.0",
-      "author": "Axw",
-      "url": "http://modules.afedium.furryaxw.top/modules/fureye_pygame.pyz",
-      "homepage": "",
-      "description": "",
-      "type": "pyz",
-      "dependencies": [],
-      "pip_dependencies": [
-        "pillow",
-        "pygame"
-      ],
-      "linux_dependencies": []
-    },
-    {
       "name": "模板",
       "id": "template",
-      "version": "1.0.0",
+      "version": "2.0.0",
       "author": "Axw",
       "url": "http://modules.afedium.furryaxw.top/modules/template.pyz",
       "homepage": "",
