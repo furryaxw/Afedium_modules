@@ -1,0 +1,347 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Afedium 摄像头视频流</title>
+    <style>
+      :root {
+        --af-background: #f4f6f8;
+        --af-surface: #ffffff;
+        --af-surface-alt: #eff2f6;
+        --af-text: #111827;
+        --af-text-muted: #6b7280;
+        --af-primary: #2563eb;
+        --af-on-primary: #ffffff;
+        --af-border: #d5dce5;
+        --af-success: #027a48;
+        --af-error: #b42318;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        padding: 20px;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        background: var(--af-background);
+        color: var(--af-text);
+      }
+      main {
+        display: grid;
+        gap: 14px;
+      }
+      .panel {
+        padding: 16px;
+        border: 1px solid var(--af-border);
+        border-radius: 8px;
+        background: var(--af-surface);
+      }
+      .toolbar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: end;
+      }
+      label {
+        display: grid;
+        gap: 6px;
+        color: var(--af-text-muted);
+        font-size: 13px;
+      }
+      input {
+        min-width: 110px;
+        border: 1px solid var(--af-border);
+        border-radius: 6px;
+        background: var(--af-surface-alt);
+        color: var(--af-text);
+        font: inherit;
+        padding: 8px 10px;
+      }
+      button {
+        border: 1px solid var(--af-primary);
+        background: var(--af-primary);
+        color: var(--af-on-primary);
+        padding: 9px 14px;
+        border-radius: 6px;
+        font: inherit;
+        cursor: pointer;
+      }
+      button:disabled {
+        cursor: not-allowed;
+        opacity: 0.55;
+      }
+      .video-shell {
+        aspect-ratio: 16 / 9;
+        width: min(100%, 960px);
+        overflow: hidden;
+        border: 1px solid var(--af-border);
+        border-radius: 10px;
+        background: #000;
+        display: grid;
+        place-items: center;
+      }
+      .video-shell img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        display: block;
+      }
+      .placeholder {
+        padding: 20px;
+        text-align: center;
+        color: #c9d2dc;
+      }
+      .metrics {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 10px;
+      }
+      .metric {
+        padding: 10px;
+        border: 1px solid var(--af-border);
+        border-radius: 8px;
+        background: var(--af-surface-alt);
+      }
+      .metric span {
+        display: block;
+        color: var(--af-text-muted);
+        font-size: 12px;
+      }
+      .metric strong {
+        display: block;
+        margin-top: 4px;
+        overflow-wrap: anywhere;
+      }
+      pre {
+        margin: 0;
+        max-height: 260px;
+        overflow: auto;
+        padding: 12px;
+        border: 1px solid var(--af-border);
+        border-radius: 6px;
+        background: var(--af-surface-alt);
+        color: var(--af-text);
+        white-space: pre-wrap;
+      }
+      .ok {
+        color: var(--af-success);
+      }
+      .bad {
+        color: var(--af-error);
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <section class="panel">
+        <h1>服务端摄像头视频流</h1>
+        <p>服务端打开摄像头，把 JPEG 帧通过 0x32 推给客户端，当前页面只负责接收并渲染。</p>
+      </section>
+
+      <section class="panel toolbar">
+        <button id="open">打开流</button>
+        <button id="start" disabled>开始推流</button>
+        <button id="stop" disabled>停止推流</button>
+        <button id="close" disabled>关闭流</button>
+        <label>
+          摄像头
+          <input id="cameraIndex" type="number" min="0" value="0">
+        </label>
+        <label>
+          FPS
+          <input id="fps" type="number" min="1" max="30" value="8">
+        </label>
+        <label>
+          宽度
+          <input id="width" type="number" min="160" max="1920" value="640">
+        </label>
+        <label>
+          高度
+          <input id="height" type="number" min="120" max="1080" value="360">
+        </label>
+      </section>
+
+      <section class="panel video-shell">
+        <img id="frame" alt="camera stream" hidden>
+        <div id="placeholder" class="placeholder">等待服务端视频流</div>
+      </section>
+
+      <section class="panel metrics">
+        <div class="metric">
+          <span>session</span>
+          <strong id="session">未打开</strong>
+        </div>
+        <div class="metric">
+          <span>frames</span>
+          <strong id="frames">0</strong>
+        </div>
+        <div class="metric">
+          <span>fps</span>
+          <strong id="fpsValue">0</strong>
+        </div>
+        <div class="metric">
+          <span>last frame</span>
+          <strong id="lastBytes">0 bytes</strong>
+        </div>
+        <div class="metric">
+          <span>status</span>
+          <strong id="status">idle</strong>
+        </div>
+      </section>
+
+      <pre id="log">等待操作</pre>
+    </main>
+
+    <script>
+      const providerId = "server_pages_demo.camera_stream";
+      const sessionBox = document.getElementById("session");
+      const framesBox = document.getElementById("frames");
+      const fpsValueBox = document.getElementById("fpsValue");
+      const lastBytesBox = document.getElementById("lastBytes");
+      const statusBox = document.getElementById("status");
+      const logBox = document.getElementById("log");
+      const frameView = document.getElementById("frame");
+      const placeholder = document.getElementById("placeholder");
+      const openButton = document.getElementById("open");
+      const startButton = document.getElementById("start");
+      const stopButton = document.getElementById("stop");
+      const closeButton = document.getElementById("close");
+      const cameraIndexInput = document.getElementById("cameraIndex");
+      const fpsInput = document.getElementById("fps");
+      const widthInput = document.getElementById("width");
+      const heightInput = document.getElementById("height");
+
+      let sessionId = "";
+      let frameCount = 0;
+      let currentUrl = "";
+      let lastStats = null;
+
+      function log(value) {
+        const text = typeof value === "string" ? value : JSON.stringify(value, null, 2);
+        logBox.textContent = new Date().toLocaleTimeString() + " " + text + "\n\n" + logBox.textContent;
+      }
+
+      function setStatus(text, ok) {
+        statusBox.textContent = text;
+        statusBox.className = ok === false ? "bad" : ok === true ? "ok" : "";
+      }
+
+      function updateButtons() {
+        openButton.disabled = Boolean(sessionId);
+        startButton.disabled = !sessionId;
+        stopButton.disabled = !sessionId;
+        closeButton.disabled = !sessionId;
+        sessionBox.textContent = sessionId || "未打开";
+        framesBox.textContent = String(frameCount);
+        fpsValueBox.textContent = lastStats && lastStats.fps ? String(lastStats.fps) : "0";
+        lastBytesBox.textContent = lastStats && lastStats.last_frame_bytes ? (String(lastStats.last_frame_bytes) + " bytes") : "0 bytes";
+      }
+
+      function clearFrame() {
+        if (currentUrl) {
+          URL.revokeObjectURL(currentUrl);
+          currentUrl = "";
+        }
+        frameView.hidden = true;
+        frameView.removeAttribute("src");
+        placeholder.hidden = false;
+      }
+
+      openButton.onclick = async () => {
+        try {
+          const result = await window.afediumBridge.openStream(providerId, {
+            page: "camera_demo",
+            opened_at: Date.now()
+          });
+          sessionId = String(result.session_id || "");
+          setStatus("opened", true);
+          log({ opened: result });
+        } catch (error) {
+          setStatus("open failed", false);
+          log(String(error && error.message ? error.message : error));
+        }
+        updateButtons();
+      };
+
+      startButton.onclick = async () => {
+        try {
+          const result = await window.afediumBridge.sendStreamMessage(sessionId, "start", {
+            camera_index: Number(cameraIndexInput.value || 0),
+            fps: Number(fpsInput.value || 8),
+            width: Number(widthInput.value || 640),
+            height: Number(heightInput.value || 360)
+          });
+          setStatus("starting", true);
+          log({ start: result });
+        } catch (error) {
+          setStatus("start failed", false);
+          log(String(error && error.message ? error.message : error));
+        }
+      };
+
+      stopButton.onclick = async () => {
+        try {
+          const result = await window.afediumBridge.sendStreamMessage(sessionId, "stop", {});
+          setStatus("stopping", true);
+          log({ stop: result });
+        } catch (error) {
+          setStatus("stop failed", false);
+          log(String(error && error.message ? error.message : error));
+        }
+      };
+
+      closeButton.onclick = async () => {
+        try {
+          const result = await window.afediumBridge.closeStream(sessionId);
+          log({ closed: result });
+          sessionId = "";
+          frameCount = 0;
+          lastStats = null;
+          clearFrame();
+          setStatus("closed", true);
+        } catch (error) {
+          setStatus("close failed", false);
+          log(String(error && error.message ? error.message : error));
+        }
+        updateButtons();
+      };
+
+      window.addEventListener("afediumstreammessage", (event) => {
+        const detail = event.detail || {};
+        log({ stream_message: detail });
+        if (detail.event === "camera_started") {
+          setStatus("streaming", true);
+        } else if (detail.event === "camera_stats") {
+          lastStats = detail.payload || {};
+          updateButtons();
+        } else if (detail.event === "camera_error") {
+          setStatus("camera error", false);
+        } else if (detail.event === "camera_stopped") {
+          setStatus("stopped", true);
+        }
+      });
+
+      window.addEventListener("afediumstreambinary", (event) => {
+        const payload = event.detail && event.detail.payload ? event.detail.payload : [];
+        const bytes = new Uint8Array(payload);
+        const blob = new Blob([bytes], { type: "image/jpeg" });
+        if (currentUrl) {
+          URL.revokeObjectURL(currentUrl);
+        }
+        currentUrl = URL.createObjectURL(blob);
+        frameView.src = currentUrl;
+        frameView.hidden = false;
+        placeholder.hidden = true;
+        frameCount += 1;
+        if (!lastStats) {
+          lastStats = {};
+        }
+        lastStats.last_frame_bytes = bytes.length;
+        updateButtons();
+      });
+
+      clearFrame();
+      updateButtons();
+    </script>
+  </body>
+</html>

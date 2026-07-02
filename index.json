@@ -6,6 +6,37 @@
   "version": 2,
   "modules": [
     {
+      "name": "渲染测试模板",
+      "id": "render_template",
+      "version": "1.0.0",
+      "author": "Axw",
+      "url": "http://modules.afedium.furryaxw.top/modules/render_template.pyz",
+      "homepage": "",
+      "description": "AFEDIUM渲染模块示例模板",
+      "type": "pyz",
+      "dependencies": [],
+      "pip_dependencies": [],
+      "linux_dependencies": []
+    },
+    {
+      "name": "Afedium 服务端页面 Demo",
+      "id": "server_pages_demo",
+      "version": "1.0.0",
+      "author": "Axw",
+      "url": "http://modules.afedium.furryaxw.top/modules/server_pages_demo.pyz",
+      "homepage": "",
+      "description": "通过系统 server_pages 聚合器发布示例页面。",
+      "type": "pyz",
+      "dependencies": [
+        "server_pages",
+        "stream_channel"
+      ],
+      "pip_dependencies": [
+        "opencv-python"
+      ],
+      "linux_dependencies": []
+    },
+    {
       "name": "模板",
       "id": "template",
       "version": "2.0.0",

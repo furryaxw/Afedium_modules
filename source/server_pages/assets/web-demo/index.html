@@ -1,0 +1,201 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Afedium 服务端页面</title>
+    <style>
+      :root {
+        --af-background: #f4f6f8;
+        --af-surface: #ffffff;
+        --af-surface-alt: #eff2f6;
+        --af-text: #111827;
+        --af-text-muted: #6b7280;
+        --af-primary: #2563eb;
+        --af-on-primary: #ffffff;
+        --af-border: #d5dce5;
+        --af-error: #b42318;
+        --af-on-error: #ffffff;
+        --af-success: #027a48;
+        --af-on-success: #ffffff;
+        --af-warning: #b54708;
+        --af-on-warning: #ffffff;
+        --af-primary-soft: #e8f0ff;
+        --af-error-soft: #fff0f0;
+        --af-success-soft: #ecfdf3;
+        --af-warning-soft: #fff6e8;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        padding: 20px;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        background: var(--af-background);
+        color: var(--af-text);
+      }
+      main {
+        display: grid;
+        gap: 14px;
+      }
+      h1 {
+        margin: 0;
+        font-size: 22px;
+        line-height: 1.25;
+      }
+      p {
+        margin: 0;
+        color: var(--af-text-muted);
+        line-height: 1.55;
+      }
+      .panel {
+        padding: 16px;
+        border: 1px solid var(--af-border);
+        border-radius: 8px;
+        background: var(--af-surface);
+      }
+      .theme-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      .swatch-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 8px;
+      }
+      .swatch {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        min-width: 0;
+        color: var(--af-text);
+        font-size: 13px;
+      }
+      .swatch-dot {
+        width: 18px;
+        height: 18px;
+        flex: 0 0 auto;
+        border: 1px solid var(--af-border);
+        border-radius: 50%;
+        background: var(--af-surface-alt);
+      }
+      .swatch-text {
+        overflow-wrap: anywhere;
+      }
+      .pill {
+        border: 1px solid var(--af-border);
+        border-radius: 999px;
+        padding: 5px 9px;
+        color: var(--af-text);
+        background: var(--af-surface-alt);
+        font-size: 13px;
+      }
+      .pill.primary {
+        border-color: var(--af-primary);
+        background: var(--af-primary-soft);
+      }
+      .pill.success {
+        border-color: var(--af-success);
+        background: var(--af-success-soft);
+      }
+      .pill.warning {
+        border-color: var(--af-warning);
+        background: var(--af-warning-soft);
+      }
+      button {
+        width: fit-content;
+        border: 1px solid var(--af-primary);
+        background: var(--af-primary);
+        color: var(--af-on-primary);
+        padding: 9px 14px;
+        border-radius: 6px;
+        font: inherit;
+        cursor: pointer;
+      }
+      button:active {
+        transform: translateY(1px);
+      }
+      pre {
+        margin: 0;
+        padding: 12px;
+        background: var(--af-surface-alt, #eff2f6);
+        border: 1px solid var(--af-border, #d5dce5);
+        border-radius: 6px;
+        color: var(--af-text, #111827);
+        white-space: pre-wrap;
+        overflow: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <section class="panel">
+        <h1>Afedium Web 运行时页面</h1>
+        <p>此页面由服务端插件提供，颜色由客户端主题注入，通过受限桥接与服务端页面 feature 通讯。</p>
+      </section>
+      <section class="panel theme-row">
+        <span class="pill primary">primary</span>
+        <span class="pill success">success</span>
+        <span class="pill warning">warning</span>
+        <span class="pill" id="mode">theme: unknown</span>
+      </section>
+      <section class="panel swatch-row" id="swatches">
+        <div class="swatch" data-var="--af-primary">
+          <span class="swatch-dot"></span>
+          <span class="swatch-text">--af-primary</span>
+        </div>
+        <div class="swatch" data-var="--af-background">
+          <span class="swatch-dot"></span>
+          <span class="swatch-text">--af-background</span>
+        </div>
+        <div class="swatch" data-var="--af-surface">
+          <span class="swatch-dot"></span>
+          <span class="swatch-text">--af-surface</span>
+        </div>
+        <div class="swatch" data-var="--af-surface-alt">
+          <span class="swatch-dot"></span>
+          <span class="swatch-text">--af-surface-alt</span>
+        </div>
+      </section>
+      <button id="echo">发送 Echo</button>
+      <pre id="out">等待操作</pre>
+    </main>
+    <script>
+      const mode = document.getElementById("mode");
+      const rootStyle = () => getComputedStyle(document.documentElement);
+      function syncSwatches() {
+        document.querySelectorAll("[data-var]").forEach((item) => {
+          const name = item.getAttribute("data-var");
+          const value = rootStyle().getPropertyValue(name).trim() || "unset";
+          item.querySelector(".swatch-dot").style.background = value;
+          item.querySelector(".swatch-text").textContent = name + ": " + value;
+        });
+      }
+      function syncThemeLabel() {
+        mode.textContent = "theme: " + ((window.afediumTheme && window.afediumTheme.mode) || "unknown");
+        syncSwatches();
+      }
+      window.addEventListener("afediumthemechange", syncThemeLabel);
+      syncThemeLabel();
+      requestAnimationFrame(syncSwatches);
+
+      document.getElementById("echo").onclick = async () => {
+        const out = document.getElementById("out");
+        if (!window.afediumBridge) {
+          out.textContent = "afediumBridge 不可用";
+          return;
+        }
+        try {
+          const result = await window.afediumBridge.invoke("echo", {
+            source: "web_runtime",
+            theme: window.afediumTheme || null
+          });
+          out.textContent = JSON.stringify(result, null, 2);
+        } catch (error) {
+          out.textContent = String(error && error.message ? error.message : error);
+        }
+      };
+    </script>
+  </body>
+</html>

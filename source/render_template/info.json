@@ -1,0 +1,13 @@
+{
+  "name": "渲染测试模板",
+  "id": "render_template",
+  "version": "1.0.0",
+  "author": "Axw",
+  "url": "http://modules.afedium.furryaxw.top/modules/render_template.pyz",
+  "homepage": "",
+  "description": "AFEDIUM渲染模块示例模板",
+  "type": "pyz",
+  "dependencies": [],
+  "pip_dependencies": [],
+  "linux_dependencies": []
+}

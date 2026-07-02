@@ -1,0 +1,285 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Afedium 实时推送测试</title>
+    <style>
+      :root {
+        --af-background: #f4f6f8;
+        --af-surface: #ffffff;
+        --af-surface-alt: #eff2f6;
+        --af-text: #111827;
+        --af-text-muted: #6b7280;
+        --af-primary: #2563eb;
+        --af-on-primary: #ffffff;
+        --af-border: #d5dce5;
+        --af-success: #027a48;
+        --af-success-soft: #ecfdf3;
+        --af-error: #b42318;
+        --af-error-soft: #fff0f0;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        padding: 20px;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        background: var(--af-background);
+        color: var(--af-text);
+      }
+
+      main {
+        display: grid;
+        gap: 14px;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: 22px;
+        line-height: 1.25;
+      }
+
+      p {
+        margin: 0;
+        color: var(--af-text-muted);
+        line-height: 1.55;
+      }
+
+      .panel {
+        padding: 16px;
+        border: 1px solid var(--af-border);
+        border-radius: 8px;
+        background: var(--af-surface);
+      }
+
+      .toolbar {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: end;
+        gap: 10px;
+      }
+
+      button {
+        min-height: 38px;
+        border: 1px solid var(--af-primary);
+        border-radius: 6px;
+        background: var(--af-primary);
+        color: var(--af-on-primary);
+        cursor: pointer;
+        font: inherit;
+        padding: 9px 13px;
+      }
+
+      button.secondary {
+        background: var(--af-surface);
+        color: var(--af-primary);
+      }
+
+      button:disabled {
+        cursor: not-allowed;
+        opacity: 0.55;
+      }
+
+      label {
+        display: grid;
+        gap: 6px;
+        color: var(--af-text-muted);
+        font-size: 13px;
+      }
+
+      input {
+        width: 150px;
+        min-height: 38px;
+        border: 1px solid var(--af-border);
+        border-radius: 6px;
+        background: var(--af-surface-alt);
+        color: var(--af-text);
+        font: inherit;
+        padding: 8px 10px;
+      }
+
+      .metrics {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 10px;
+      }
+
+      .metric {
+        min-width: 0;
+        padding: 10px;
+        border: 1px solid var(--af-border);
+        border-radius: 8px;
+        background: var(--af-surface-alt);
+      }
+
+      .metric span {
+        display: block;
+        color: var(--af-text-muted);
+        font-size: 12px;
+      }
+
+      .metric strong {
+        display: block;
+        margin-top: 4px;
+        overflow-wrap: anywhere;
+      }
+
+      pre {
+        margin: 0;
+        max-height: 320px;
+        overflow: auto;
+        padding: 12px;
+        border: 1px solid var(--af-border);
+        border-radius: 6px;
+        background: var(--af-surface-alt);
+        color: var(--af-text);
+        white-space: pre-wrap;
+      }
+
+      .ok {
+        color: var(--af-success);
+      }
+
+      .bad {
+        color: var(--af-error);
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <section class="panel">
+        <h1>0x31 实时推送测试</h1>
+        <p>点击开始后，页面只发起一次 invoke；后续消息由服务端通过 0x31 PUSH 主动推送给客户端。</p>
+      </section>
+
+      <section class="panel toolbar">
+        <button id="start">开始推送</button>
+        <button id="stop" class="secondary" disabled>停止推送</button>
+        <label>
+          数量
+          <input id="count" type="number" min="1" max="100" value="8">
+        </label>
+        <label>
+          间隔 ms
+          <input id="interval" type="number" min="50" max="10000" value="1000">
+        </label>
+      </section>
+
+      <section class="panel metrics">
+        <div class="metric">
+          <span>received</span>
+          <strong id="received">0</strong>
+        </div>
+        <div class="metric">
+          <span>last sequence</span>
+          <strong id="sequence">-</strong>
+        </div>
+        <div class="metric">
+          <span>server count</span>
+          <strong id="server-count">-</strong>
+        </div>
+        <div class="metric">
+          <span>status</span>
+          <strong id="status">idle</strong>
+        </div>
+      </section>
+
+      <pre id="log">等待服务端推送</pre>
+    </main>
+
+    <script>
+      const logBox = document.getElementById("log");
+      const receivedBox = document.getElementById("received");
+      const sequenceBox = document.getElementById("sequence");
+      const serverCountBox = document.getElementById("server-count");
+      const statusBox = document.getElementById("status");
+      const startButton = document.getElementById("start");
+      const stopButton = document.getElementById("stop");
+      const countInput = document.getElementById("count");
+      const intervalInput = document.getElementById("interval");
+
+      let received = 0;
+      let running = false;
+
+      function log(value) {
+        const line = typeof value === "string" ? value : JSON.stringify(value, null, 2);
+        logBox.textContent = new Date().toLocaleTimeString() + " " + line + "\n\n" + logBox.textContent;
+      }
+
+      function setStatus(text, ok) {
+        statusBox.textContent = text;
+        statusBox.className = ok === false ? "bad" : ok === true ? "ok" : "";
+      }
+
+      function updateButtons() {
+        startButton.disabled = running;
+        stopButton.disabled = !running;
+      }
+
+      function requireBridge() {
+        if (!window.afediumBridge || typeof window.afediumBridge.invoke !== "function") {
+          throw new Error("afediumBridge.invoke 不可用");
+        }
+      }
+
+      startButton.onclick = async () => {
+        try {
+          requireBridge();
+          const count = Math.max(1, Math.min(100, Number(countInput.value || 8)));
+          const intervalMs = Math.max(50, Math.min(10000, Number(intervalInput.value || 1000)));
+          const result = await window.afediumBridge.invoke("start_realtime_push", {
+            count: count,
+            interval_ms: intervalMs,
+            message: "0x31 PUSH"
+          });
+          running = true;
+          log({ started: result });
+          setStatus("running", true);
+        } catch (error) {
+          running = false;
+          setStatus("start failed", false);
+          log(String(error && error.message ? error.message : error));
+        }
+        updateButtons();
+      };
+
+      stopButton.onclick = async () => {
+        try {
+          requireBridge();
+          const result = await window.afediumBridge.invoke("stop_realtime_push", {});
+          running = false;
+          log({ stopped: result });
+          setStatus("stopped", true);
+        } catch (error) {
+          setStatus("stop failed", false);
+          log(String(error && error.message ? error.message : error));
+        }
+        updateButtons();
+      };
+
+      window.addEventListener("afediumserverpageevent", (event) => {
+        const detail = event.detail || {};
+        const statePatch = detail.state_patch || {};
+        received += 1;
+        receivedBox.textContent = String(received);
+        sequenceBox.textContent = detail.sequence == null ? "-" : String(detail.sequence);
+        if (statePatch.server_push_count != null) {
+          serverCountBox.textContent = String(statePatch.server_push_count);
+        }
+        if (statePatch.server_push_running === false || detail.event === "server_push_finished") {
+          running = false;
+        } else if (statePatch.server_push_running === true) {
+          running = true;
+        }
+        setStatus(detail.event || "event", detail.event !== "server_push_error");
+        log({ realtime_event: detail });
+        updateButtons();
+      });
+
+      updateButtons();
+    </script>
+  </body>
+</html>

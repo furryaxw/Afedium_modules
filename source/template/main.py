@@ -29,7 +29,12 @@ class AFEDIUMPlugin(AfediumPluginBase):
             log.warning(f"[{self.id}] 警告: 未能加载资源 src/img.png")
 
         # 4. 【接口演示：指令注册】
-        comm_lib.register("demo", self.command_handler)
+        # 获取根指令对象，并挂载一个默认的缺省处理器
+        cmd_demo = comm_lib.register("demo", self.command_default, "V2架构演示指令组")
+
+        # 链式派生子指令，彻底告别 if/elif
+        cmd_demo.subcommand("info", self.cmd_demo_info, "查看演示插件的详细运行信息")
+        cmd_demo.subcommand("edit", self.cmd_demo_edit, "动态修改配置文件并落盘")
 
         # 5. 【接口演示：事件总线】
         static["event_handler"].register_event("ExternalIO_IN", self.on_message_received)
@@ -57,34 +62,25 @@ class AFEDIUMPlugin(AfediumPluginBase):
 
     # ================= 业务方法演示 =================
 
-    def command_handler(self, ctx, args: list):
-        """
-        处理外界发来的 'demo' 指令
-        :param ctx: CommandContext 上下文对象，用于多端输出隔离
-        :param args: 用户参数
-        """
-        if not args:
-            # 使用 ctx.reply() 代替原来的 return 纯文本，支持分段流式输出
-            msg = self.config.conf.get("welcome_message")
-            ctx.reply(f"当前配置消息: {msg}")
-            return "输入 'demo help' 查看更多功能"
+    def command_default(self, ctx, args: list):
+        """处理纯输入 'demo' 时的缺省逻辑"""
+        msg = self.config.conf.get("welcome_message")
+        ctx.reply(f"当前配置消息: {msg}")
+        return "输入 'help' 查看所有可用指令树"
 
-        action = args[0]
-        if action == "help":
-            ctx.reply("这是一个指令上下文演示。")
-            # 可以获取触发指令的客户端连接信息（如果是通过 WebSocket 触发的话）
-            if ctx.client_id:
-                ctx.reply(f"您的客户端对象是: {ctx.client_id.remote_address}")
-            return "帮助信息打印完毕"
+    def cmd_demo_info(self, ctx, args: list):
+        """对应 'demo info'"""
+        ctx.reply("这是一个指令上下文演示。")
+        if ctx.client_id:
+            ctx.reply(f"您的客户端连接对象是: {ctx.client_id.remote_address}")
+        return "信息打印完毕"
 
-        elif action == "edit":
-            # 8. 【接口演示：安全覆写配置】
-            self.config.conf["welcome_message"] = "配置已被动态修改！"
-            self.config.update()  # 自带读写锁，线程安全地将改动落盘
-            return "配置已更新"
-
-        else:
-            return f"未知参数: {action}"
+    def cmd_demo_edit(self, ctx, args: list):
+        """对应 'demo edit'"""
+        # 8. 【接口演示：安全覆写配置】
+        self.config.conf["welcome_message"] = "配置已被动态修改！"
+        self.config.update()
+        return "配置已成功更新"
 
     def on_message_received(self, event: Event):
         """

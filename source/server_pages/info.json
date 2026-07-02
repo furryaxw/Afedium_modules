@@ -1,0 +1,18 @@
+{
+  "name": "Afedium 服务端页面 Demo",
+  "id": "server_pages_demo",
+  "version": "1.0.0",
+  "author": "Axw",
+  "url": "http://modules.afedium.furryaxw.top/modules/server_pages_demo.pyz",
+  "homepage": "",
+  "description": "通过系统 server_pages 聚合器发布示例页面。",
+  "type": "pyz",
+  "dependencies": [
+    "server_pages",
+    "stream_channel"
+  ],
+  "pip_dependencies": [
+    "opencv-python"
+  ],
+  "linux_dependencies": []
+}
